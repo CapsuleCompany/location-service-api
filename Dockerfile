@@ -5,17 +5,26 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Install system dependencies and Python 3.12
+# Install prerequisites
 RUN apt-get update && apt-get install -y \
-    software-properties-common wget \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update && apt-get install -y \
-    python3.12 python3.12-dev \
+    software-properties-common wget build-essential curl unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.12 manually
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update && apt-get install -y \
+    python3.12 python3.12-dev python3.12-venv \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install GDAL and dependencies
+RUN apt-get update && apt-get install -y \
     gdal-bin libgdal-dev libgeos-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pip manually using get-pip.py
+# Manually install pip
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3.12 get-pip.py && rm get-pip.py
 
 # Set up aliases for convenience
@@ -39,5 +48,5 @@ EXPOSE 8000
 # Run the application
 CMD ["python3.12", "manage.py", "runserver", "0.0.0.0:8000"]
 
-# Set the default shell to bash to ensure aliases work
+# Set the default shell to bash
 SHELL ["/bin/bash", "-c"]

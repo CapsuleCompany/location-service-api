@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
 
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', '/usr/lib/libgeos_c.so')
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
+
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH", "/lib/libgdal.so.30")
+GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH", "/lib/aarch64-linux-gnu/libgeos_c.so")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -18,7 +19,9 @@ SECRET_KEY = "django-insecure-hmo)i2b-t@ri7g*#=e0-0b3d_44w*#9!202nldkf#9!77$*z7%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "dev.capsuleio.com"
+]
 
 
 # Application definition
@@ -31,6 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django.contrib.gis',
+    'location'
 ]
 
 MIDDLEWARE = [
