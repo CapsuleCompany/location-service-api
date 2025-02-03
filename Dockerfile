@@ -16,28 +16,27 @@ RUN apt-get install -y \
     libdbus-1-dev dbus dbus-x11 libgirepository1.0-dev gobject-introspection \
     libcairo2-dev libjpeg-dev libpng-dev libffi-dev \
     gdal-bin libgdal-dev libgeos-dev \
-    python3.12 python3.12-dev python3.12-venv libpq-dev \
+    python3.12 python3.12-dev libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Manually install pip
-RUN wget https://bootstrap.pypa.io/get-pip.py && python3.12 get-pip.py && rm get-pip.py
-
-# Set up aliases for convenience
-RUN echo "alias python=python3.12" >> ~/.bashrc && \
-    echo "alias makemigrations='python manage.py makemigrations'" >> ~/.bashrc && \
-    echo "alias migrate='python manage.py migrate'" >> ~/.bashrc
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3.12 - \
+    && echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc
 
 # Set working directory
 WORKDIR /app
 
-# Copy application code and requirements file
-COPY . /app/
+# Copy dependency files first for better caching
+COPY pyproject.toml poetry.lock /app/
 
-# Install Python dependencies globally
-RUN python3.12 -m pip install --upgrade pip setuptools wheel \
-    && python3.12 -m pip install --no-cache-dir -r requirements.txt \
-    && python3.12 -m pip install --no-cache-dir kafka-python-ng six
+# Install dependencies using Poetry
+RUN export PATH=$HOME/.local/bin:$PATH && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root --no-interaction --no-ansi
+
+# Copy the rest of the application code
+COPY . /app/
 
 # Expose port
 EXPOSE 8000
