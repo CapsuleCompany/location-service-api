@@ -5,28 +5,18 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Install prerequisites
-RUN apt-get update && apt-get install -y \
-    software-properties-common wget build-essential curl unzip pkg-config \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Add Deadsnakes PPA for Python 3.12
+RUN apt-get update && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get update
 
-# Install Python 3.12 manually
-RUN add-apt-repository ppa:deadsnakes/ppa -y && \
-    apt-get update && apt-get install -y \
-    python3.12 python3.12-dev python3.12-venv \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install GDAL and dependencies
-RUN apt-get update && apt-get install -y \
-    gdal-bin libgdal-dev libgeos-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Cairo dependencies for pycairo
-RUN apt-get update && apt-get install -y \
+# Install prerequisites and Python 3.12
+RUN apt-get install -y \
+    wget build-essential curl unzip pkg-config \
+    libdbus-1-dev dbus dbus-x11 libgirepository1.0-dev gobject-introspection \
     libcairo2-dev libjpeg-dev libpng-dev libffi-dev \
+    gdal-bin libgdal-dev libgeos-dev \
+    python3.12 python3.12-dev python3.12-venv libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -41,17 +31,18 @@ RUN echo "alias python=python3.12" >> ~/.bashrc && \
 # Set working directory
 WORKDIR /app
 
-# Copy application code
+# Copy application code and requirements file
 COPY . /app/
 
-# Install Python dependencies
-RUN python3.12 -m pip install --upgrade pip \
-    && python3.12 -m pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies globally
+RUN python3.12 -m pip install --upgrade pip setuptools wheel \
+    && python3.12 -m pip install --no-cache-dir -r requirements.txt \
+    && python3.12 -m pip install --no-cache-dir kafka-python-ng six
 
 # Expose port
 EXPOSE 8000
 
-# Run the application without using the virtual environment
+# Run the application
 CMD ["python3.12", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # Set the default shell to bash
