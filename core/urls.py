@@ -1,6 +1,6 @@
 from django.urls import path, include
 
 urlpatterns = [
-    path('location/', include('location.urls')),
+    path("api/routing/", include("routing.urls")),
+    path("api/locations/", include("location.urls")),
 ]
-

@@ -7,7 +7,7 @@ ENV TZ=Etc/UTC
 
 # Install prerequisites
 RUN apt-get update && apt-get install -y \
-    software-properties-common wget build-essential curl unzip \
+    software-properties-common wget build-essential curl unzip pkg-config \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,6 +24,12 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Cairo dependencies for pycairo
+RUN apt-get update && apt-get install -y \
+    libcairo2-dev libjpeg-dev libpng-dev libffi-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Manually install pip
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3.12 get-pip.py && rm get-pip.py
 
@@ -35,17 +41,17 @@ RUN echo "alias python=python3.12" >> ~/.bashrc && \
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN python3.12 -m pip install --upgrade pip && python3.12 -m pip install -r requirements.txt
-
 # Copy application code
 COPY . /app/
+
+# Install Python dependencies
+RUN python3.12 -m pip install --upgrade pip \
+    && python3.12 -m pip install --no-cache-dir -r requirements.txt
 
 # Expose port
 EXPOSE 8000
 
-# Run the application
+# Run the application without using the virtual environment
 CMD ["python3.12", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # Set the default shell to bash

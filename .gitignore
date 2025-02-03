@@ -32,6 +32,11 @@ MANIFEST
 *.manifest
 *.spec
 
+location/migrations
+location/migrations/*
+routing/migrations
+routing/migrations/*
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

@@ -1,7 +1,10 @@
-from django.urls import path
-from .views import LocationUpdateView, LocationListView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import AddressViewSet
+
+router = DefaultRouter()
+router.register(r"addresses", AddressViewSet, basename="address")
 
 urlpatterns = [
-    path('update/', LocationUpdateView.as_view(), name='location-update'),
-    path('list/', LocationListView.as_view(), name='location-list'),
+    path("", include(router.urls)),
 ]
