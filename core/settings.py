@@ -79,7 +79,7 @@ SIMPLE_JWT = {
 # Database settings
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         "NAME": env.str("POSTGRES_DB", default="app_database"),
         "USER": env.str("POSTGRES_USER", default="postgres"),
         "PASSWORD": env.str("POSTGRES_PASSWORD", default="password"),
