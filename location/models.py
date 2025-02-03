@@ -71,7 +71,6 @@ class Address(BaseModel):
 
     user_id = models.UUIDField(null=True, blank=True, help_text="UUID from user-api JWT")
     tenant_id = models.UUIDField(null=True, blank=True, help_text="External Tenant ID")
-    business_id = models.UUIDField(null=True, blank=True, help_text="External Business ID")
     is_billing = models.BooleanField(default=False, help_text="Marks as billing address")
     is_default = models.BooleanField(default=False)
 
