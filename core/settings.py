@@ -83,9 +83,8 @@ DATABASES = {
         "NAME": env.str("POSTGRES_DB", default="app_database"),
         "USER": env.str("POSTGRES_USER", default="postgres"),
         "PASSWORD": env.str("POSTGRES_PASSWORD", default="password"),
-        "HOST": env.str("POSTGRES_HOST", default="localhost"),
+        "HOST": env.str("POSTGIS_HOST", default="localhost"),
         "PORT": env.int("POSTGRES_PORT", default=5432),
-        "OPTIONS": {"options": "-c search_path=locations_api"},
     }
 }
 

@@ -53,9 +53,9 @@ class AddressSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise serializers.ValidationError({"error": f"Error creating location objects: {str(e)}"})
 
-        data["city"] = city.name
-        data["state"] = state.name
-        data["country"] = country.pk
+        data["city"] = city
+        data["state"] = state
+        data["country"] = country
         data["address_line_1"] = address_line_1
         data["address_line_2"] = address_line_2
         return data
@@ -69,15 +69,12 @@ class AddressSerializer(serializers.ModelSerializer):
             "city": instance.city.name if instance.city else None,
             "state": instance.state.name if instance.state else None,
             "country": instance.country.code if instance.country else None,
-            "latitude": instance.latitude,
-            "longitude": instance.longitude,
             "is_billing": instance.is_billing,
         }
 
     def create(self, validated_data):
-        user = self.context.get("user", "")
+        user = self.context.pop("user", "")
         validated_data["user_id"] = user.user_id if user else None
-
         return Address.objects.get_or_create(**validated_data)[0]
 
     def update(self, instance, validated_data):
@@ -98,9 +95,9 @@ class AddressSerializer(serializers.ModelSerializer):
         if not country_code:
             raise serializers.ValidationError({"error": "Country is required."})
 
-        country, _ = Country.objects.get_or_create(code=country_code)
-        state, _ = State.objects.get_or_create(name=state_name, country=country)
-        city, _ = City.objects.get_or_create(name=city_name, state=state, country=country)
+        country, _ = Country.objects.get_or_create(code=country_code.code)
+        state, _ = State.objects.get_or_create(name=state_name.name, country=country)
+        city, _ = City.objects.get_or_create(name=city_name.name, state=state, country=country)
 
         validated_data["address_line_1"] = address_1
         validated_data["postal_code"] = postal_code
